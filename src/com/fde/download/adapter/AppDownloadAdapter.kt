@@ -82,16 +82,16 @@ class AppDownloadAdapter(
 
             EventType.DOWNLOAD_IN_PROGRESS -> {
                 holder.stopBtn.isClickable = CLICKABLE
-//                holder.stopBtn.text = holder.itemView.context.getString(R.string.cancel)
-//                holder.appProgressBar.progressTintList =
-//                    ColorStateList.valueOf(Color.BLUE)
+                holder.stopBtn.text = holder.itemView.context.getString(R.string.cancel)
+                holder.appProgressBar.progressTintList =
+                    ColorStateList.valueOf(Color.BLUE)
                 holder.stopBtn.setOnClickListener {
-//                    EventBus.getDefault().post(appName?.let { it1 ->
-//                        Event(
-//                            EventType.DOWNLOAD_STOP,
-//                            it1
-//                        )
-//                    })
+                    EventBus.getDefault().post(appName?.let { it1 ->
+                        Event(
+                            EventType.DOWNLOAD_STOP,
+                            it1
+                        )
+                    })
                 }
             }
 

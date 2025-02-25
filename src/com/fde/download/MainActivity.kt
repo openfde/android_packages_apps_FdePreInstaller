@@ -317,7 +317,8 @@ class MainActivity : ComponentActivity() {
             return
         }
         appDownloadInfo.progress = progress
-        appDownloadAdapter.updateProgress(appName)
+        // appDownloadAdapter.updateProgress(appName)
+        appDownloadAdapter.notifyDataSetChanged()
     }
 
     fun requestFinish(appName: String) {
