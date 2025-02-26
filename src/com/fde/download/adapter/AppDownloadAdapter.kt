@@ -43,7 +43,7 @@ class AppDownloadAdapter(
         val bitmap = appDownloadInfo.bitmap
         val progress = appDownloadInfo.progress
 
-        holder.appName.text = appName
+        holder.appName.text = appName?.replace("_"," ")
         holder.appIcon.setImageBitmap(bitmap)
 
         holder.appProgressBar.progress = progress

@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
+import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -14,6 +15,8 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -61,9 +64,13 @@ class MainActivity : ComponentActivity() {
     private lateinit var context: Context
 
     private lateinit var nextBtn: Button
+    private lateinit var imgLoading: ImageView
     private lateinit var recyclerView: RecyclerView
     private lateinit var downloadingRecyclerView: RecyclerView
     private lateinit var noDownloadingRecyclerView: RecyclerView
+
+    private var frameAnimation: AnimationDrawable? = null
+
 
     private val appAdapter = AppAdapter()
     private val appDownloadAdapter = AppDownloadAdapter()
@@ -71,20 +78,19 @@ class MainActivity : ComponentActivity() {
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
-            Log.w(TAG, "onServiceConnected.......... ")
             if (service is DownloadService.DownloadBinder) {
                 downloadService = service.getService()
             }
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
-            Log.w(TAG, "onServiceDisconnected.......... ")
         }
     }
 
     private val handler = Handler(Looper.getMainLooper()) {
         when (it.what) {
             SUCCESS -> {
+                hideProgressDialog();
                 appAdapter.setAppDownloadInfoList(singleton.getAppDownloadInfoList())
                 installApp()
                 // recyclerView.visibility = View.VISIBLE
@@ -102,10 +108,6 @@ class MainActivity : ComponentActivity() {
             val action = intent.action
             val packageName = intent.data?.schemeSpecificPart
             val appName = packageName?.let { Utils.getAppName(context, it) }
-            Log.w(
-                TAG,
-                "InstallResultReceiver  action $action, packageName $packageName, appName $appName"
-            )
             EventBus.getDefault().post(appName?.let { Event(EventType.INSTALL_COMPLETED, it) })
 
             val appNameExtra = intent.getStringExtra("appName")
@@ -122,7 +124,7 @@ class MainActivity : ComponentActivity() {
         intentService = Intent(this, DownloadService::class.java)
         startService(intentService)
         bindService(intentService, connection, Context.BIND_AUTO_CREATE)
-
+        showProgressDialog();
         initData()
 
         val intentFilter = IntentFilter().apply {
@@ -136,6 +138,7 @@ class MainActivity : ComponentActivity() {
 
     private fun initView() {
         nextBtn = findViewById(R.id.nextBtn)
+        imgLoading = findViewById(R.id.imgLoading)
         recyclerView = findViewById(R.id.application_recycler_view)
         downloadingRecyclerView = findViewById(R.id.downloadingRecyclerView)
         noDownloadingRecyclerView = findViewById(R.id.noDownloadingRecyclerView)
@@ -192,6 +195,20 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun showProgressDialog() {
+        nextBtn?.visibility = View.GONE
+        imgLoading?.visibility = View.VISIBLE
+        imgLoading?.setBackgroundResource(R.drawable.frame_animation)
+        frameAnimation = imgLoading?.getBackground() as AnimationDrawable
+        frameAnimation?.start()
+    }
+
+    private fun hideProgressDialog() {
+        nextBtn?.visibility = View.VISIBLE
+        imgLoading?.visibility = View.GONE
+        frameAnimation?.stop()
+        imgLoading?.clearAnimation()
+    }
     private fun parseContent( jsonResponse:String){
         try {
             val jsonArray = JsonParser.parseString(jsonResponse).asJsonArray
