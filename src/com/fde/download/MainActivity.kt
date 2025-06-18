@@ -81,6 +81,7 @@ class MainActivity : ComponentActivity() {
             if (service is DownloadService.DownloadBinder) {
                 downloadService = service.getService()
             }
+			initData()
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
@@ -125,7 +126,7 @@ class MainActivity : ComponentActivity() {
         startService(intentService)
         bindService(intentService, connection, Context.BIND_AUTO_CREATE)
         showProgressDialog();
-        initData()
+        
 
         val intentFilter = IntentFilter().apply {
             addAction(Intent.ACTION_PACKAGE_INSTALL)
@@ -294,6 +295,14 @@ class MainActivity : ComponentActivity() {
         val jsonString = inputStream.bufferedReader().use { it.readText() }
         if (jsonString != null) {
             parseContent(jsonString)
+        }
+
+        runOnUiThread {
+            Toast.makeText(
+                context,
+                "${context.getString(R.string.not_network)}",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 

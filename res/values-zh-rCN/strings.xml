@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FdePreInstaller</string>
+    <string name="app_name">FDE精选应用</string>
 
     <string name="skip">跳过</string>
     <!-- download app page -->
@@ -22,4 +22,5 @@
     <string name="check">检查</string>
     <string name="update">更新</string>
     <string name="latest_version">已经是最新版本</string>
+    <string name="not_network"> 无网络</string>
 </resources>
